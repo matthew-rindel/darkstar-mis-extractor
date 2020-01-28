@@ -82,6 +82,7 @@ def readSimGroup(objectTypes, rawData, offset):
 
     offset += struct.calcsize(simGroup)
     children = []
+    finalChildren = {}
     i = 0
     while i < header[-1]:
         objectInfo = struct.unpack_from(object, rawData, offset)
@@ -95,7 +96,7 @@ def readSimGroup(objectTypes, rawData, offset):
 
 
         print(b"Unpacked a " + objectInfo[0])
-        children.append(objectInfo)
+        children.append((offset, objectInfo))
         if objectInfo[0] in objectTypes:
             (newOffset, moreChildren) = objectTypes[objectInfo[0]](objectTypes, rawData, offset)
             offset = newOffset
@@ -110,9 +111,17 @@ def readSimGroup(objectTypes, rawData, offset):
         offset = newOffset
         if someString == "":
             break
+        finalChildren[someString.decode("utf8")] = children[i]
         i += 1
         print("Child: " + someString.decode("utf8"))
 
+    for name, value in finalChildren.items():
+        if value[1][0] == b"HERC" or value[1][0] == b"TANK" or value[1][0] == b"FLYR" or value[1][0] == b"TRRT":
+            with open(name + ".veh", "wb") as shapeFile:
+                print("extracting " + name + ".veh")
+                new_file_byte_array = bytearray(rawData[value[0]:value[0] + value[1][1] + 8])
+                shapeFile.write(new_file_byte_array)
+    print(len(finalChildren))
     return (offset, children)
 
 
