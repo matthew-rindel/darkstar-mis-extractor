@@ -116,7 +116,7 @@ def readSimGroup(objectTypes, rawData, offset):
         print("Child: " + someString.decode("utf8"))
 
     for name, value in finalChildren.items():
-        if value[1][0] == b"HERC" or value[1][0] == b"TANK" or value[1][0] == b"FLYR" or value[1][0] == b"TRRT":
+        if value[1][0] == b"HERC" or value[1][0] == b"TANK" or value[1][0] == b"FLYR":
             with open(name + ".veh", "wb") as shapeFile:
                 print("extracting " + name + ".veh")
                 new_file_byte_array = bytearray(rawData[value[0]:value[0] + value[1][1] + 8])
